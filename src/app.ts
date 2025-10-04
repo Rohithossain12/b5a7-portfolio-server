@@ -1,14 +1,15 @@
 import compression from "compression";
 import cors from "cors";
 import express from "express";
-
+import userRoutes from './modules/user/user.route';
 const app = express();
+import cookieParser from 'cookie-parser';
 
 
 app.use(cors());
 app.use(compression()); 
 app.use(express.json());
-
+app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -20,6 +21,9 @@ app.use(
 app.get("/", (_req, res) => {
   res.send("Server is running");
 });
+
+
+app.use('/api/v1/users', userRoutes);
 
 
 

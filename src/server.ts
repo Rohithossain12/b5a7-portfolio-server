@@ -1,35 +1,38 @@
-import http, { Server } from "http";
-import app from "./app";
-import dotenv from "dotenv";
-import { prisma } from "./config/db";
+import http, { Server } from 'http';
+import dotenv from 'dotenv';
+import app from './app';
+import { prisma } from './config/db';
+import { seedAdmin } from './modules/user/user.controller';
 
 dotenv.config();
 
 let server: Server | null = null;
 
-
 async function connectToDB() {
   try {
-  await prisma.$connect();
-    console.log("✅ Database connected");
+    await prisma.$connect();
+    console.log('✅ Database connected');
   } catch (error) {
-    console.error("❌ DB connection error:", error);
-    process.exit(1)
+    console.error('❌ DB connection error:', error);
+    process.exit(1);
   }
 }
 
-
 async function startServer() {
   try {
-    connectToDB()
+    await connectToDB();
+
+    // Seed admin on server start
+    await seedAdmin();
+
     server = http.createServer(app);
     server.listen(process.env.PORT, () => {
-      console.log(`🚀 Server is running on port ${process.env.PORT}`);
+      console.log(`🚀 Server running on port ${process.env.PORT}`);
     });
 
     handleProcessEvents();
   } catch (error) {
-    console.error("❌ Error during server startup:", error);
+    console.error('❌ Error during server startup:', error);
     process.exit(1);
   }
 }
@@ -39,14 +42,7 @@ async function gracefulShutdown(signal: string) {
 
   if (server) {
     server.close(async () => {
-      console.log("✅ HTTP server closed.");
-
-      try {
-        console.log("Server shutdown complete.");
-      } catch (error) {
-        console.error("❌ Error during shutdown:", error);
-      }
-
+      console.log('✅ HTTP server closed.');
       process.exit(0);
     });
   } else {
@@ -54,21 +50,17 @@ async function gracefulShutdown(signal: string) {
   }
 }
 
-
 function handleProcessEvents() {
-  process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
-  process.on("SIGINT", () => gracefulShutdown("SIGINT"));
-
-  process.on("uncaughtException", (error) => {
-    console.error("💥 Uncaught Exception:", error);
-    gracefulShutdown("uncaughtException");
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  process.on('uncaughtException', (error) => {
+    console.error('💥 Uncaught Exception:', error);
+    gracefulShutdown('uncaughtException');
   });
-
-  process.on("unhandledRejection", (reason) => {
-    console.error("💥 Unhandled Rejection:", reason);
-    gracefulShutdown("unhandledRejection");
+  process.on('unhandledRejection', (reason) => {
+    console.error('💥 Unhandled Rejection:', reason);
+    gracefulShutdown('unhandledRejection');
   });
 }
-
 
 startServer();
