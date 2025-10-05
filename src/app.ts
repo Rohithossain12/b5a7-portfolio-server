@@ -1,13 +1,14 @@
 import compression from "compression";
 import cors from "cors";
 import express from "express";
-import userRoutes from './modules/user/user.route';
 const app = express();
 import cookieParser from 'cookie-parser';
+import { userRoutes } from "./modules/user/user.route";
+import { blogRoutes } from "./modules/blog/blog.route";
 
 
 app.use(cors());
-app.use(compression()); 
+app.use(compression());
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -24,6 +25,7 @@ app.get("/", (_req, res) => {
 
 
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/blogs', blogRoutes);
 
 
 
