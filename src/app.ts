@@ -5,6 +5,7 @@ const app = express();
 import cookieParser from 'cookie-parser';
 import { userRoutes } from "./modules/user/user.route";
 import { blogRoutes } from "./modules/blog/blog.route";
+import { projectRoutes } from "./modules/project/project.route";
 
 
 app.use(cors());
@@ -26,6 +27,7 @@ app.get("/", (_req, res) => {
 
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/blogs', blogRoutes);
+app.use('/api/v1/projects', projectRoutes);
 
 
 
