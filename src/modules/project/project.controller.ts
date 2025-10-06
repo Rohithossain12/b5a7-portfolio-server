@@ -148,12 +148,16 @@ const updateProject = async (req: Request, res: Response) => {
             thumbnail = result.secure_url;
         }
 
+        const featuresArray = typeof features === "string" ? features.split(",").map(f => f.trim()) : features || [];
+        const techArray = typeof technologies === "string" ? technologies.split(",").map(t => t.trim()) : technologies || [];
+
+
         const updated = await ProjectService.updateProject(id, {
             title,
             slug: finalSlug,
             description,
-            features,
-            technologies,
+            features: featuresArray,
+            technologies: techArray,
             frontendUrl,
             backendUrl,
             thumbnail,
