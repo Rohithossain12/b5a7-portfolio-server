@@ -23,6 +23,7 @@ const createProject = async (req: Request, res: Response) => {
             technologies,
             frontendUrl,
             backendUrl,
+            liveUrl,
             slug,
             thumbnail: thumbnailFromBody,
         } = req.body;
@@ -36,8 +37,14 @@ const createProject = async (req: Request, res: Response) => {
                 message: "Slug already exists. Choose different title or slug.",
             });
 
-        const featuresArray = typeof features === "string" ? features.split(",").map(f => f.trim()) : features || [];
-        const techArray = typeof technologies === "string" ? technologies.split(",").map(t => t.trim()) : technologies || [];
+        const featuresArray =
+            typeof features === "string"
+                ? features.split(",").map((f) => f.trim())
+                : features || [];
+        const techArray =
+            typeof technologies === "string"
+                ? technologies.split(",").map((t) => t.trim())
+                : technologies || [];
 
         let thumbnail = thumbnailFromBody || null;
 
@@ -54,6 +61,7 @@ const createProject = async (req: Request, res: Response) => {
             technologies: techArray,
             frontendUrl: frontendUrl || null,
             backendUrl: backendUrl || null,
+            liveUrl: liveUrl || null,
             thumbnail,
         } as any);
 
@@ -121,57 +129,67 @@ const getProjectById = async (req: Request, res: Response) => {
 
 
 const updateProject = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const file = (req as any).file as Express.Multer.File | undefined;
-        const {
-            title,
-            description,
-            features,
-            technologies,
-            frontendUrl,
-            backendUrl,
-            slug,
-            thumbnail: thumbnailFromBody,
-        } = req.body;
+  try {
+    const { id } = req.params;
+    const file = (req as any).file as Express.Multer.File | undefined;
+    const {
+      title,
+      description,
+      features,
+      technologies,
+      frontendUrl,
+      backendUrl,
+      liveUrl, 
+      slug,
+      thumbnail: thumbnailFromBody,
+    } = req.body;
 
-        const finalSlug = slug?.trim() || (title ? slugify(title, { lower: true, strict: true }) : undefined);
+    const finalSlug =
+      slug?.trim() ||
+      (title ? slugify(title, { lower: true, strict: true }) : undefined);
 
-        const existing = await ProjectService.getProjectById(id);
-        if (!existing)
-            return res.status(404).json({ success: false, message: "Project not found" });
+    const existing = await ProjectService.getProjectById(id);
+    if (!existing)
+      return res.status(404).json({ success: false, message: "Project not found" });
 
-        let thumbnail = thumbnailFromBody ?? existing.thumbnail ?? null;
+    let thumbnail = thumbnailFromBody ?? existing.thumbnail ?? null;
 
-        if (file) {
-            const result = await uploadFromBuffer(file.buffer, "portfolio/projects");
-            thumbnail = result.secure_url;
-        }
-
-        const featuresArray = typeof features === "string" ? features.split(",").map(f => f.trim()) : features || [];
-        const techArray = typeof technologies === "string" ? technologies.split(",").map(t => t.trim()) : technologies || [];
-
-
-        const updated = await ProjectService.updateProject(id, {
-            title,
-            slug: finalSlug,
-            description,
-            features: featuresArray,
-            technologies: techArray,
-            frontendUrl,
-            backendUrl,
-            thumbnail,
-        } as any);
-
-        res.json({
-            success: true,
-            message: "Project updated successfully!",
-            data: updated,
-        });
-    } catch (err: any) {
-        res.status(500).json({ success: false, message: err.message });
+    if (file) {
+      const result = await uploadFromBuffer(file.buffer, "portfolio/projects");
+      thumbnail = result.secure_url;
     }
+
+    const featuresArray =
+      typeof features === "string"
+        ? features.split(",").map((f) => f.trim())
+        : features || [];
+    const techArray =
+      typeof technologies === "string"
+        ? technologies.split(",").map((t) => t.trim())
+        : technologies || [];
+
+    const updated = await ProjectService.updateProject(id, {
+      title,
+      slug: finalSlug,
+      description,
+      features: featuresArray,
+      technologies: techArray,
+      frontendUrl,
+      backendUrl,
+      liveUrl, 
+      thumbnail,
+    } as any);
+
+    res.json({
+      success: true,
+      message: "Project updated successfully!",
+      data: updated,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
+
 
 const deleteProject = async (req: Request, res: Response) => {
     try {
