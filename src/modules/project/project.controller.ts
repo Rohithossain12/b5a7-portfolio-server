@@ -128,7 +128,9 @@ const getProjectById = async (req: Request, res: Response) => {
 };
 
 
-const updateProject = async (req: Request, res: Response) => {
+
+
+export const updateProject = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const file = (req as any).file as Express.Multer.File | undefined;
@@ -139,34 +141,31 @@ const updateProject = async (req: Request, res: Response) => {
       technologies,
       frontendUrl,
       backendUrl,
-      liveUrl, 
-      slug,
-      thumbnail: thumbnailFromBody,
+      liveUrl,
+      slug: slugFromBody,
+      thumbnail: thumbnailFromBody, 
     } = req.body;
 
     const finalSlug =
-      slug?.trim() ||
-      (title ? slugify(title, { lower: true, strict: true }) : undefined);
+      slugFromBody?.trim() || (title ? slugify(title, { lower: true, strict: true }) : undefined);
 
     const existing = await ProjectService.getProjectById(id);
     if (!existing)
       return res.status(404).json({ success: false, message: "Project not found" });
 
+    
     let thumbnail = thumbnailFromBody ?? existing.thumbnail ?? null;
 
     if (file) {
+   
       const result = await uploadFromBuffer(file.buffer, "portfolio/projects");
       thumbnail = result.secure_url;
     }
 
     const featuresArray =
-      typeof features === "string"
-        ? features.split(",").map((f) => f.trim())
-        : features || [];
+      typeof features === "string" ? features.split(",").map(f => f.trim()) : features || [];
     const techArray =
-      typeof technologies === "string"
-        ? technologies.split(",").map((t) => t.trim())
-        : technologies || [];
+      typeof technologies === "string" ? technologies.split(",").map(t => t.trim()) : technologies || [];
 
     const updated = await ProjectService.updateProject(id, {
       title,
@@ -176,19 +175,16 @@ const updateProject = async (req: Request, res: Response) => {
       technologies: techArray,
       frontendUrl,
       backendUrl,
-      liveUrl, 
+      liveUrl,
       thumbnail,
     } as any);
 
-    res.json({
-      success: true,
-      message: "Project updated successfully!",
-      data: updated,
-    });
+    res.json({ success: true, message: "Project updated successfully!", data: updated });
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
 
 
 const deleteProject = async (req: Request, res: Response) => {
