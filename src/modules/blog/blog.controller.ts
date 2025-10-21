@@ -72,9 +72,6 @@ const getBlogById = async (req: Request, res: Response) => {
 };
 
 
-
-
-
 const getBlogBySlug = async (req: Request, res: Response) => {
     try {
         const { slug } = req.params;
@@ -94,20 +91,30 @@ const getBlogBySlug = async (req: Request, res: Response) => {
     }
 };
 
-const updateBlog = async (req: Request, res: Response) => {
+
+export const updateBlog = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const file = (req as any).file as Express.Multer.File | undefined;
-    const { title, excerpt, content, slug, coverUrl: coverUrlFromBody } = req.body;
+    const {
+      title,
+      excerpt,
+      content,
+      slug: slugFromBody,
+      coverUrl: coverUrlFromBody,
+    } = req.body;
 
-    const finalSlug = slug?.trim() || (title ? slugify(title, { lower: true, strict: true }) : undefined);
+    const finalSlug =
+      slugFromBody?.trim() ||
+      (title ? slugify(title, { lower: true, strict: true }) : undefined);
 
-    
     const existing = await BlogService.getBlogById(id);
-    if (!existing) return res.status(404).json({ success: false, message: "Blog not found" });
+    if (!existing)
+      return res
+        .status(404)
+        .json({ success: false, message: "Blog not found" });
 
     let coverUrl = coverUrlFromBody ?? existing.coverUrl ?? null;
-
     if (file) {
       const result = await uploadFromBuffer(file.buffer, "portfolio/blogs");
       coverUrl = result.secure_url;
@@ -121,9 +128,15 @@ const updateBlog = async (req: Request, res: Response) => {
       coverUrl,
     } as any);
 
-    res.json({ success: true, message: "Blog updated successfully!", data: updated });
+    res.json({
+      success: true,
+      message: "Blog updated successfully!",
+      data: updated,
+    });
   } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
+    res
+      .status(500)
+      .json({ success: false, message: err.message || "Internal Server Error" });
   }
 };
 
