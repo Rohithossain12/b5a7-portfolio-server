@@ -4,11 +4,11 @@ import { verifyToken } from "../../middlewares/auth.middleware";
 import { upload } from "../../middlewares/multer";
 
 const router = Router();
-router.post("/",  upload.single("coverUrl"), BlogController.createBlog);
+router.post("/", verifyToken, upload.single("coverUrl"), BlogController.createBlog);
 router.get("/", BlogController.getAllBlogs);
 router.get("/:id", BlogController.getBlogById)
 router.get("/:slug", BlogController.getBlogBySlug);
-router.patch("/:id", upload.single("coverUrl"), BlogController.updateBlog);
+router.patch("/:id", verifyToken, upload.single("coverUrl"), BlogController.updateBlog);
 router.delete("/:id", BlogController.deleteBlog);
 
 export const blogRoutes = router;

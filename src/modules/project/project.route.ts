@@ -10,8 +10,8 @@ const router = Router();
 router.get("/", ProjectController.getAllProjects);
 router.get("/slug/:slug", ProjectController.getProjectBySlug);
 router.get("/:id", ProjectController.getProjectById);
-router.post("/", upload.single("thumbnail"), ProjectController.createProject);
-router.patch("/:id", upload.single("thumbnail"), ProjectController.updateProject);
+router.post("/",verifyToken, upload.single("thumbnail"), ProjectController.createProject);
+router.patch("/:id",verifyToken, upload.single("thumbnail"), ProjectController.updateProject);
 router.delete("/:id",ProjectController.deleteProject);
 
 export const projectRoutes = router;

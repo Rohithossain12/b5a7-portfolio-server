@@ -11,6 +11,8 @@ interface JwtPayload {
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies.token;
 
+    console.log(token);
+
     if (!token) {
         return res.status(401).json({ error: 'No token, authorization denied' });
     }

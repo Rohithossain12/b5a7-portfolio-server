@@ -3,7 +3,7 @@ import { login } from './user.controller';
 
 const router = Router();
 
-// Login route
+
 router.post('/login', login);
 
 export const userRoutes= router;
