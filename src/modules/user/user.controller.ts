@@ -34,7 +34,7 @@ export const login = async (req: Request, res: Response) => {
     });
 
 
-    res.cookie('token', token, {
+    res.cookie('accessToken', token, {
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
