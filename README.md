@@ -64,7 +64,7 @@ This backend serves as the API for the portfolio website, handling authenticatio
 
 ## 🌐 Live Deployment
 
-Live URL: [https://your-backend-url.com](https://your-backend-url.com) *(replace with actual URL later)*
+Live URL: https://b5a7-portfolio-server.vercel.app
 
 ---
 
